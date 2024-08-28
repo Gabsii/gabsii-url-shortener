@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  app:
+    image: ghcr.io/gabsii/gabsii-url-shortener:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    env_file:
+      - config/.env
+
+  redis:
+    image: redis:6-alpine
+    volumes:
+      - redis-data:/data
+
+  redis-backup:
+    image: redis:6-alpine
+    volumes:
+      - ./redis-data:/data
+      - ./backups:/backups
+    command: >
+      sh -c 'while true; do
+        redis-cli -h redis SAVE &&
+        cp /data/dump.rdb /backups/dump_$$(date +%Y%m%d_%H%M%S).rdb &&
+        sleep 86400;
+      done'
+volumes:
+  redis-data:
