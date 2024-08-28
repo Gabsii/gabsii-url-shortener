@@ -40,25 +40,6 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
-      - name: Create pre-deployment Redis backup
-        run: |
-          docker-compose exec -T redis redis-cli SAVE
-          cp /path/to/redis/data/dump.rdb ${{ env.BACKUP_PATH }}/pre_deploy_$(date +%Y%m%d_%H%M%S).rdb
-
       - name: Deploy
         run: |
-          docker-compose pull
-          docker-compose down --remove-orphans
-          docker-compose up -d
-
-      - name: Verify Redis data
-        run: |
-          sleep 10  # Give Redis time to start up
-          KEYS_COUNT=$(docker-compose exec -T redis redis-cli DBSIZE)
-          echo "Redis has $KEYS_COUNT keys after deployment"
-          if [ "$KEYS_COUNT" -eq "0" ]; then
-            echo "Warning: Redis appears to be empty. Restoring from backup..."
-            docker-compose down
-            cp ${{ env.BACKUP_PATH }}/pre_deploy_*.rdb /path/to/redis/data/dump.rdb
-            docker-compose up -d
-          fi
+          /data/url-shortener/deploy.sh
