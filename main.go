@@ -43,11 +43,17 @@ func main() {
 
 	// Define routes
 	r.HandleFunc("/shorten", shortenURL).Methods("POST")
+	r.HandleFunc("/health-check", healthCheck).Methods("GET")
+	r.HandleFunc("/", indexRoute).Methods("GET")
 	r.HandleFunc("/{shortURL}", redirectURL).Methods("GET")
 
 	// Start server
 	log.Println("Server starting on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", r))
+}
+
+func indexRoute(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "pages/index.html")
 }
 
 func shortenURL(w http.ResponseWriter, r *http.Request) {
@@ -59,12 +65,27 @@ func shortenURL(w http.ResponseWriter, r *http.Request) {
 
 	shortURL := generateShortURL()
 	err := redisClient.Set(r.Context(), shortURL, longURL, 0).Err()
+	log.Printf("Shortening URL: %s -> %s\n", shortURL, longURL)
+
 	if err != nil {
 		http.Error(w, "Error storing URL", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprintf(w, "%s/%s", hostURL, shortURL)
+	// Get all the query parameters as a map
+	queryParams := r.URL.Query()
+
+	// Access a specific query parameter by key
+	format := queryParams.Get("format") // This will return the first value associated with "paramKey"
+
+	if format == "" {
+		fmt.Fprintf(w, "%s/%s", hostURL, shortURL)
+	} else if format == "html" {
+		// Redirect to the index with the shortURL as a query parameter
+		fullURL := fmt.Sprintf("%s/%s", hostURL, shortURL)
+		redirectURL := fmt.Sprintf("/?shortURL=%s", fullURL)
+		http.Redirect(w, r, redirectURL, http.StatusFound)
+	}
 }
 
 func redirectURL(w http.ResponseWriter, r *http.Request) {
@@ -81,9 +102,13 @@ func redirectURL(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, longURL, http.StatusFound)
 }
 
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func generateShortURL() string {
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
-	const length = 6
+	const length = 8
 	shortURL := make([]byte, length)
 	for i := range shortURL {
 		shortURL[i] = charset[rand.Intn(len(charset))]

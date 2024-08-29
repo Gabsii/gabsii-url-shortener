@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shortener</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Piazzolla:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Piazzolla", serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #fffbee;
+        color: #242424;
+      }
+      .container {
+        background-color: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(36, 36, 36, 0.1);
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        position: relative;
+      }
+      h1 {
+        color: #242424;
+        margin-bottom: 1.5rem;
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 10;
+      }
+      input[type="url"] {
+        padding: 0.75rem;
+        font-size: 1rem;
+        border: 2px solid #242424;
+        border-radius: 8px;
+        font-family: "Piazzolla", serif;
+        color: #242424;
+      }
+      input[type="submit"].submit-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+        background-color: #242424;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+        font-family: "Piazzolla", serif;
+        font-weight: 700;
+        display: block;
+        width: 100%;
+      }
+      input[type="submit"].submit-button:hover {
+        background-color: #3a3a3a;
+        transform: translateY(-2px);
+      }
+      input[type="submit"].submit-button:active {
+        transform: translateY(0);
+      }
+      ::placeholder {
+        color: #888;
+      }
+      .footer {
+        font-size: 0.9rem;
+        margin-top: 1.5rem;
+      }
+      .footer a {
+        color: #242424;
+        text-decoration: none;
+        font-weight: 700;
+        transition: color 0.3s ease;
+      }
+      .footer a:hover {
+        color: #3a3a3a;
+      }
+      .success-message {
+        display: none;
+        background-color: #e8f5e9;
+        border: 2px solid #4caf50;
+        color: #2e7d32;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+      }
+      .success-message a {
+        color: #2e7d32;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .success-message a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>URL Shortener</h1>
+      <div id="successMessage" class="success-message">
+        Your URL has been shortened! Here's your link:
+        <a id="shortUrlLink" href="#" target="_blank"></a>
+      </div>
+      <form action="/shorten?format=html" method="POST">
+        <input
+          type="url"
+          name="url"
+          placeholder="Enter your long URL here"
+          required
+        />
+        <input type="submit" class="submit-button" value="Shorten URL" />
+      </form>
+      <div class="footer">
+        Made with ❤️ by
+        <a href="https://gabsii.com" target="_blank" rel="noopener noreferrer"
+          >Gabsii</a
+        >
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const shortURL = urlParams.get("shortURL");
+
+        if (shortURL) {
+          const successMessage = document.getElementById("successMessage");
+          const shortUrlLink = document.getElementById("shortUrlLink");
+
+          shortUrlLink.href = shortURL;
+          shortUrlLink.textContent = shortURL;
+          successMessage.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Copy go.mod and main.go
 COPY go.mod main.go ./
+COPY pages pages
 
 # Download dependencies and generate go.sum
 RUN go mod download
