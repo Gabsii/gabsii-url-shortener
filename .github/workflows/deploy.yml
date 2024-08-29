@@ -40,10 +40,6 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
-      - name: Deploy
-        run: |
-          /data/url-shortener/deploy.sh
-
   deploy:
     runs-on: self-hosted
     needs: build
