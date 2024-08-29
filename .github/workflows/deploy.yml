@@ -11,7 +11,7 @@ env:
   BACKUP_PATH: /path/to/backups # Define the backup path as an environment variable
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: self-hosted
     permissions:
       contents: read
@@ -40,6 +40,18 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
+      - name: Deploy
+        run: |
+          /data/url-shortener/deploy.sh
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
       - name: Deploy
         run: |
           /data/url-shortener/deploy.sh
